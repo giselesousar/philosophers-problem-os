@@ -30,7 +30,7 @@ void print_states(){
     int i;
     int eating = 0;
 
-    printf("Vetor de estados atual: [");
+    printf(" \n Vetor de estados atual: [");
     for(i = 0; i < N; i++){
         printf(" %d ", state[i]);
         if(state[i] == EATING){
@@ -58,7 +58,6 @@ int test(int i){
 
        state[i] = EATING;
 
-       printf("\n");
 
        pthread_cond_signal(&p[i]);
 
@@ -77,6 +76,8 @@ entao eh bloqueada
 void take_forks(int *i){
     pthread_mutex_lock(&mutex);
     state[*i] = HUNGRY;
+
+    print_states();
     
     int t = test(*i);
 
@@ -94,6 +95,9 @@ e chama a funcao test passando como parametro as threads vizinhas
 void put_forks(int *i){
     pthread_mutex_lock(&mutex);
     state[*i] = THINKING;
+
+    print_states();
+
     int t = test((*i+N-1)%N);
     t = test((*i+1)%N);
     pthread_mutex_unlock(&mutex);
