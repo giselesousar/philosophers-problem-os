@@ -1,5 +1,9 @@
 /*
 Author: Gisele Ribeiro
+
+gcc -pthread -o philosophers-problem philosophers-problem.c
+./philosophers-problem
+
 */
 
 #include <stdio.h>
@@ -22,6 +26,25 @@ pthread_cond_t p[N]; //variaveis de condicao dos filosofos
 
 int state[N]; //estado atual de cada filosofo {0, 1 , 2} 
 
+void print_states(){
+    int i;
+    int eating = 0;
+
+    printf("Vetor de estados atual: [");
+    for(i = 0; i < N; i++){
+        printf(" %d ", state[i]);
+        if(state[i] == EATING){
+            eating++;
+        }
+    }
+    if(eating == 1){
+        printf(" ] --> %d filosofo esta comendo \n", eating);
+    }else{
+        printf(" ] --> %d filosofos estao comendo \n", eating);
+    }
+    
+}
+
 /*
 Parametros: indice referente a uma thread 
 a funcao verifica se o estado da thread eh 1 e se seus vizinhos nao estao com estado 2
@@ -32,9 +55,15 @@ retorna 0 quando a condicao nao eh satisfeita
 int test(int i){
    
     if(state[i] == HUNGRY && state[LEFT] != EATING && state[RIGHT] != EATING){
+
        state[i] = EATING;
-       printf("Thread %d is eating! \n", i);
+
+       printf("\n");
+
        pthread_cond_signal(&p[i]);
+
+       print_states();
+
        return 1;
     }
     return 0;
@@ -76,14 +105,9 @@ void* philosopher(void *context){
     int *i = context;
 
     while(1){
-        printf("Thread %d is thinking! \n", *i);
-        sleep(1+ rand()%5); //think
-
-        printf("Thread %d is hungry! \n", *i);
+        sleep(1+ rand()%5); //thinking
         take_forks(i);
-        sleep(1+ rand()%8); //eat
-        
-        printf("Thread %d put forks! \n", *i);
+        sleep(1+ rand()%8); //eating
         put_forks(i);
     }
 
@@ -112,8 +136,5 @@ int main(){
     return 0;
 }
 
-/*
-gcc -pthread -o philosophers-problem philosophers-problem.c
-./philosophers-problem
-*/
+
 
